@@ -10,6 +10,7 @@
 		3468765E26125D2EE9DF604C /* Pods_Netflix.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F118E114F82A64C285C8562D /* Pods_Netflix.framework */; };
 		5215985C2E084F9CFDE79451 /* Pods_NetflixTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F59F3B5E035427E19F2C8764 /* Pods_NetflixTests.framework */; };
 		9C49705F60E74612FADCB952 /* Pods_Netflix_NetflixUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E8A381A769228D04C33141 /* Pods_Netflix_NetflixUITests.framework */; };
+		B678E2612A643E8C00D09637 /* AppKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = B678E2602A643E8C00D09637 /* AppKeys.swift */; };
 		B67E827B2A63DACC00D156D2 /* UIImageEx.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67E827A2A63DACC00D156D2 /* UIImageEx.swift */; };
 		B67E82812A63F87900D156D2 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67E82802A63F87900D156D2 /* APIClient.swift */; };
 		B67E82842A63F8F600D156D2 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67E82832A63F8F600D156D2 /* AppConstants.swift */; };
@@ -52,6 +53,7 @@
 		1CF0583BB73F4C833801FB98 /* Pods-NetflixTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NetflixTests.release.xcconfig"; path = "Target Support Files/Pods-NetflixTests/Pods-NetflixTests.release.xcconfig"; sourceTree = "<group>"; };
 		3ABD1B73DF3AFD3B4862864F /* Pods-Netflix-NetflixUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Netflix-NetflixUITests.debug.xcconfig"; path = "Target Support Files/Pods-Netflix-NetflixUITests/Pods-Netflix-NetflixUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		A734D524265D293820AFC8EC /* Pods-Netflix.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Netflix.release.xcconfig"; path = "Target Support Files/Pods-Netflix/Pods-Netflix.release.xcconfig"; sourceTree = "<group>"; };
+		B678E2602A643E8C00D09637 /* AppKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppKeys.swift; sourceTree = "<group>"; };
 		B67E827A2A63DACC00D156D2 /* UIImageEx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageEx.swift; sourceTree = "<group>"; };
 		B67E82802A63F87900D156D2 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		B67E82832A63F8F600D156D2 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				B67E82832A63F8F600D156D2 /* AppConstants.swift */,
+				B678E2602A643E8C00D09637 /* AppKeys.swift */,
 			);
 			path = Constants;
 			sourceTree = "<group>";
@@ -527,6 +530,7 @@
 			files = (
 				B6C1E6B52A5575A8006C52F7 /* SearchViewController.swift in Sources */,
 				B6C1E67E2A5570B7006C52F7 /* MainTabBarViewController.swift in Sources */,
+				B678E2612A643E8C00D09637 /* AppKeys.swift in Sources */,
 				B67E827B2A63DACC00D156D2 /* UIImageEx.swift in Sources */,
 				B6C1E6B72A5575C6006C52F7 /* DownloadsViewController.swift in Sources */,
 				B6C1E6BA2A559503006C52F7 /* HomeCollectionViewTableViewCell.swift in Sources */,
