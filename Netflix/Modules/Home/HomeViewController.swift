@@ -28,6 +28,9 @@ class HomeViewController: UIViewController {
         configureNavBar()
         let headerView = HeroHeaderView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTableView.tableHeaderView = headerView
+        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppKeys.APIKey, method: .get, responseClass: TrendingMovies.self) { response in
+            
+        }
     }
     
     override func viewDidLayoutSubviews() {
