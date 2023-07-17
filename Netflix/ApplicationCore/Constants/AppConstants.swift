@@ -8,9 +8,9 @@
 import Foundation
 
 struct AppConstants {
-    // Base URL
+    // MARK: - Base URL
     static let baseURL = "https://api.themoviedb.org/3/"
-    // EndPoints
+    // MARK: - EndPoints
     static let trending = "trending/"
     static let trendingMovie = "movie/day?api_key="
     static let trendingTv = "tv/day?api_key="
@@ -18,4 +18,7 @@ struct AppConstants {
     static let popularMovies = "popular?api_key="
     static let upcomingMovies = "upcoming?api_key="
     static let topRatedMovies = "top_rated?api_key="
+    
+    // MARK: - Image base URL
+    static let imgBaseURL = "https://image.tmdb.org/t/p/w500/"
 }

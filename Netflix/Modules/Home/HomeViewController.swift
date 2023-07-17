@@ -28,14 +28,7 @@ class HomeViewController: UIViewController {
         configureNavBar()
         let headerView = HeroHeaderView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTableView.tableHeaderView = headerView
-        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingMovie + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
-            switch response {
-            case .success(let data):
-                print(data)
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -78,6 +71,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: HomeCollectionViewTableViewCell.identifier, for: indexPath) as? HomeCollectionViewTableViewCell else { return UITableViewCell()}
+        configureHomeTableViewCells(cell: cell, indexPath: indexPath)
         return cell
     }
     
@@ -93,5 +87,60 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         let offset = scrollView.contentOffset.y + defaultOffset
         
         navigationController?.navigationBar.transform = .init(translationX: 0, y: min(0, -offset))
+    }
+}
+
+// MARK: - Extension for configuring table view cell
+private extension HomeViewController {
+    func configureHomeTableViewCells(cell: HomeCollectionViewTableViewCell, indexPath: IndexPath) {
+        switch indexPath.section {
+        case Sections.trendingMovies.rawValue:
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingMovie + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+                switch response {
+                case .success(let data):
+                    cell.configureCell(with: data.results)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        case Sections.trendingTV.rawValue:
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingTv + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+                switch response {
+                case .success(let data):
+                    cell.configureCell(with: data.results)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        case Sections.popular.rawValue:
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.popularMovies + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+                switch response {
+                case .success(let data):
+                    cell.configureCell(with: data.results)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        case Sections.upcomingMovies.rawValue:
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.upcomingMovies + AppKeys.APIKey, method: .get, responseClass: UpcomingMoviesModel.self) { response in
+                switch response {
+                case .success(let data):
+                    cell.configureCell(with: data.results)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        case Sections.topRated.rawValue:
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.topRatedMovies + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+                switch response {
+                case .success(let data):
+                    cell.configureCell(with: data.results)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        default:
+            print("Noting for configuring HomeTableViewCell")
+        }
     }
 }

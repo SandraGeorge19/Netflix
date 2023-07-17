@@ -16,6 +16,7 @@ class ItemCollectionViewCell: UICollectionViewCell {
     private let poosterImgView: UIImageView = {
        let imgView = UIImageView()
         imgView.contentMode = .scaleAspectFill
+        imgView.clipsToBounds = true
         return imgView
     }()
     
@@ -35,8 +36,8 @@ class ItemCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Function(s)
-    func configureCell(with model: String) {
-        guard let url = URL(string: model) else { return }
+    func configureCell(with imgURL: String) {
+        guard let url = URL(string: imgURL) else { return }
         poosterImgView.kf.setImage(with: url)
     }
 }
