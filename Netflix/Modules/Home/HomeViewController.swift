@@ -28,8 +28,13 @@ class HomeViewController: UIViewController {
         configureNavBar()
         let headerView = HeroHeaderView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTableView.tableHeaderView = headerView
-        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppKeys.APIKey, method: .get, responseClass: TrendingMovies.self) { response in
-            
+        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingMovie + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+            switch response {
+            case .success(let data):
+                print(data)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
         }
     }
     

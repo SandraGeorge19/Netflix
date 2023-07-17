@@ -1,41 +1,28 @@
 //
-//  TrendingMovies.swift
+//  Result.swift
 //  Netflix
 //
-//  Created by Sandra on 16/07/2023.
+//  Created by Sandra on 17/07/2023.
 //
 
 import Foundation
 
-// MARK: - TrendingMovies
-struct TrendingMovies: Codable {
-    let page: Int
-    let results: [Result]
-    let totalPages, totalResults: Int
-
-    enum CodingKeys: String, CodingKey {
-        case page, results
-        case totalPages = "total_pages"
-        case totalResults = "total_results"
-    }
-}
-
 // MARK: - Result
-struct Result: Codable {
-    let adult: Bool
-    let backdropPath: String
-    let id: Int
+struct ResultModel: Codable {
+    let adult: Bool?
+    let backdropPath: String?
+    let id: Int?
     let title: String?
-    let originalLanguage: String
+    let originalLanguage: String?
     let originalTitle: String?
-    let overview, posterPath: String
-    let mediaType: MediaType
-    let genreIDS: [Int]
-    let popularity: Double
+    let overview, posterPath: String?
+    let mediaType: MediaType?
+    let genreIDS: [Int]?
+    let popularity: Double?
     let releaseDate: String?
     let video: Bool?
-    let voteAverage: Double
-    let voteCount: Int
+    let voteAverage: Double?
+    let voteCount: Int?
     let name, originalName, firstAirDate: String?
     let originCountry: [String]?
 
@@ -61,6 +48,7 @@ struct Result: Codable {
     }
 }
 
+// MARK: - Media Type
 enum MediaType: String, Codable {
     case movie = "movie"
     case tv = "tv"
