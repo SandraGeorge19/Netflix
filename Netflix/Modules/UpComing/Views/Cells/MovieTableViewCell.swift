@@ -7,10 +7,10 @@
 
 import UIKit
 
-class UpcomingTableViewCell: UITableViewCell {
+class MovieTableViewCell: UITableViewCell {
 
     // MARK: - Constant(s)
-    static let identifier = "UpcomingTableViewCell"
+    static let identifier = "MovieTableViewCell"
     // MARK: - Properties
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -65,6 +65,8 @@ class UpcomingTableViewCell: UITableViewCell {
         let playButtonConstraints = [
             playButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             playButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            playButton.heightAnchor.constraint(equalToConstant: 50),
+            playButton.widthAnchor.constraint(equalToConstant: 50),
             playButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 16)
         ]
         NSLayoutConstraint.activate(poosterImgViewConstraints)

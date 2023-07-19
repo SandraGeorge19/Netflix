@@ -12,7 +12,7 @@ class UpComingViewController: UIViewController {
     // MARK: - Properties
     private let upcomingTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.register(UpcomingTableViewCell.self, forCellReuseIdentifier: UpcomingTableViewCell.identifier)
+        tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.identifier)
         return tableView
     }()
     private var movies: [ResultModel] = []
@@ -64,7 +64,7 @@ extension UpComingViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: UpcomingTableViewCell.identifier, for: indexPath) as? UpcomingTableViewCell else { return UITableViewCell()}
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableViewCell.identifier, for: indexPath) as? MovieTableViewCell else { return UITableViewCell()}
         cell.configureCell(with: movies[indexPath.row])
         return cell
     }

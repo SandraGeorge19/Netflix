@@ -18,6 +18,8 @@ struct AppConstants {
     static let popularMovies = "popular?api_key="
     static let upcomingMovies = "upcoming?api_key="
     static let topRatedMovies = "top_rated?api_key="
+    static let discover = "discover/"
+    static let topSearch = "movie?api_key="
     
     // MARK: - Image base URL
     static let imgBaseURL = "https://image.tmdb.org/t/p/w500/"
