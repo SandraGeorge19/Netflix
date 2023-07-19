@@ -17,7 +17,15 @@ class SearchViewController: UIViewController {
         tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.identifier)
         return tableView
     }()
+    
+    private let searchController: UISearchController = {
+        let controller = UISearchController(searchResultsController: SearchResultViewController())
+        controller.searchBar.placeholder = "Search for a movie or a TV show..."
+        controller.searchBar.searchBarStyle = .minimal
+        return controller
+    }()
     private var movies: [ResultModel] = []
+    weak var searchBarTapDelegate: SearchBarTapDelegate?
     
     // MARK: - Lifecycle Method(s)
     override func viewDidLoad() {
@@ -26,9 +34,12 @@ class SearchViewController: UIViewController {
         title = "Top Searches"
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.tintColor = .white
+        navigationItem.searchController = searchController
         view.addSubview(topSearchTableView)
         setupTopTableViewDelegates()
         getDiscoverMovies()
+        searchController.searchResultsUpdater = self
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -48,7 +59,8 @@ class SearchViewController: UIViewController {
     }
     
     private func getDiscoverMovies() {
-        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.discover + AppConstants.topSearch + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+        let parameters = ["api_key" : AppKeys.APIKey]
+        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.discover + AppConstants.movieKey, method: .get, parameters: parameters, responseClass: TrendingMoviesModel.self) { response in
             switch response {
             case .success(let data):
                 self.movies = data.results
@@ -58,6 +70,10 @@ class SearchViewController: UIViewController {
             }
         }
     }
+    
+    func searchBarTapped() {
+            searchBarTapDelegate?.searchBarDidTap()
+        }
 }
 
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
@@ -73,4 +89,20 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return view.bounds.height / 7.0
     }
+}
+
+extension SearchViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+
+        guard let query = searchBar.text,
+              !query.trimmingCharacters(in: .whitespaces).isEmpty,
+              query.trimmingCharacters(in: .whitespaces).count >= 3,
+              let resultController = searchController.searchResultsController as? SearchResultViewController else { return }
+        resultController.query = query
+        resultController.searchBarDidTap()
+    }
+}
+protocol SearchBarTapDelegate: AnyObject {
+    func searchBarDidTap()
 }

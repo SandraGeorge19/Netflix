@@ -93,9 +93,10 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - Extension for configuring table view cell
 private extension HomeViewController {
     func configureHomeTableViewCells(cell: HomeCollectionViewTableViewCell, indexPath: IndexPath) {
+        let parameters = ["api_key" : AppKeys.APIKey]
         switch indexPath.section {
         case Sections.trendingMovies.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingMovie + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingMovie, method: .get, parameters: parameters,responseClass: TrendingMoviesModel.self) { response in
                 switch response {
                 case .success(let data):
                     cell.configureCell(with: data.results)
@@ -104,7 +105,7 @@ private extension HomeViewController {
                 }
             }
         case Sections.trendingTV.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingTv + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingTv, method: .get, parameters: parameters,responseClass: TrendingMoviesModel.self) { response in
                 switch response {
                 case .success(let data):
                     cell.configureCell(with: data.results)
@@ -113,7 +114,7 @@ private extension HomeViewController {
                 }
             }
         case Sections.popular.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.popularMovies + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.popularMovies, method: .get, parameters: parameters, responseClass: TrendingMoviesModel.self) { response in
                 switch response {
                 case .success(let data):
                     cell.configureCell(with: data.results)
@@ -122,7 +123,7 @@ private extension HomeViewController {
                 }
             }
         case Sections.upcomingMovies.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.upcomingMovies + AppKeys.APIKey, method: .get, responseClass: UpcomingMoviesModel.self) { response in
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.upcomingMovies, method: .get, parameters: parameters, responseClass: UpcomingMoviesModel.self) { response in
                 switch response {
                 case .success(let data):
                     cell.configureCell(with: data.results)
@@ -131,7 +132,7 @@ private extension HomeViewController {
                 }
             }
         case Sections.topRated.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.topRatedMovies + AppKeys.APIKey, method: .get, responseClass: TrendingMoviesModel.self) { response in
+            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.topRatedMovies, method: .get, parameters: parameters, responseClass: TrendingMoviesModel.self) { response in
                 switch response {
                 case .success(let data):
                     cell.configureCell(with: data.results)

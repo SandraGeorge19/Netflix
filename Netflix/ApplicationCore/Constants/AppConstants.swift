@@ -12,15 +12,20 @@ struct AppConstants {
     static let baseURL = "https://api.themoviedb.org/3/"
     // MARK: - EndPoints
     static let trending = "trending/"
-    static let trendingMovie = "movie/day?api_key="
-    static let trendingTv = "tv/day?api_key="
+    static let trendingMovie = "movie/day"
+    static let trendingTv = "tv/day"
     static let movie = "movie/"
-    static let popularMovies = "popular?api_key="
-    static let upcomingMovies = "upcoming?api_key="
-    static let topRatedMovies = "top_rated?api_key="
+    static let popularMovies = "popular"
+    static let upcomingMovies = "upcoming"
+    static let topRatedMovies = "top_rated"
     static let discover = "discover/"
-    static let topSearch = "movie?api_key="
+    static let movieKey = "movie"
+    static let search = "search/"
+    static let queryKey = "&query="
     
     // MARK: - Image base URL
     static let imgBaseURL = "https://image.tmdb.org/t/p/w500/"
+    
+    // MARK: - Youtube API Keys
+    static let youtubeBaseURL = "https://youtube.googleapis.com/youtube/v3/search"
 }

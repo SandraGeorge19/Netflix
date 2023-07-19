@@ -40,7 +40,8 @@ class UpComingViewController: UIViewController {
     }
    
     func getUpcomingMovies() {
-        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.upcomingMovies + AppKeys.APIKey, method: .get, responseClass: UpcomingMoviesModel.self) { [weak self] response in
+        let parameters = ["api_key" : AppKeys.APIKey]
+        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.upcomingMovies, method: .get, parameters: parameters, responseClass: UpcomingMoviesModel.self) { [weak self] response in
             guard let self = self else { return }
             switch response {
             case .success(let data):

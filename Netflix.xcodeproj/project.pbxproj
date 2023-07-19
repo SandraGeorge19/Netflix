@@ -35,6 +35,7 @@
 		B6C1E6B72A5575C6006C52F7 /* DownloadsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C1E6B62A5575C6006C52F7 /* DownloadsViewController.swift */; };
 		B6C1E6BA2A559503006C52F7 /* HomeCollectionViewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C1E6B92A559503006C52F7 /* HomeCollectionViewTableViewCell.swift */; };
 		B6C1E6BD2A559EB4006C52F7 /* HeroHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C1E6BC2A559EB4006C52F7 /* HeroHeaderView.swift */; };
+		B6D0CBF22A6819C800292899 /* SearchResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D0CBF12A6819C800292899 /* SearchResultViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +90,7 @@
 		B6C1E6B62A5575C6006C52F7 /* DownloadsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsViewController.swift; sourceTree = "<group>"; };
 		B6C1E6B92A559503006C52F7 /* HomeCollectionViewTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCollectionViewTableViewCell.swift; sourceTree = "<group>"; };
 		B6C1E6BC2A559EB4006C52F7 /* HeroHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroHeaderView.swift; sourceTree = "<group>"; };
+		B6D0CBF12A6819C800292899 /* SearchResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultViewController.swift; sourceTree = "<group>"; };
 		C7DF3D23D6A31661B602F056 /* Pods-Netflix-NetflixUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Netflix-NetflixUITests.release.xcconfig"; path = "Target Support Files/Pods-Netflix-NetflixUITests/Pods-Netflix-NetflixUITests.release.xcconfig"; sourceTree = "<group>"; };
 		C7E8A381A769228D04C33141 /* Pods_Netflix_NetflixUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Netflix_NetflixUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F118E114F82A64C285C8562D /* Pods_Netflix.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Netflix.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -269,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				B6C1E6AD2A5574F0006C52F7 /* Downloads */,
+				B6D0CBF02A6819A600292899 /* SearchResult */,
 				B6C1E6AC2A5574B4006C52F7 /* Search */,
 				B6C1E6B12A557570006C52F7 /* UpComing */,
 				B6C1E6AA2A557482006C52F7 /* Home */,
@@ -328,6 +331,14 @@
 				B603B8D12A657E5800F1757B /* ItemCollectionViewCell.swift */,
 			);
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		B6D0CBF02A6819A600292899 /* SearchResult */ = {
+			isa = PBXGroup;
+			children = (
+				B6D0CBF12A6819C800292899 /* SearchResultViewController.swift */,
+			);
+			path = SearchResult;
 			sourceTree = "<group>";
 		};
 		D08F881B7497D6AA74F1D84B /* Pods */ = {
@@ -582,6 +593,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B6C1E6B52A5575A8006C52F7 /* SearchViewController.swift in Sources */,
+				B6D0CBF22A6819C800292899 /* SearchResultViewController.swift in Sources */,
 				B6C1E67E2A5570B7006C52F7 /* MainTabBarViewController.swift in Sources */,
 				B678E2612A643E8C00D09637 /* AppKeys.swift in Sources */,
 				B603B8D22A657E5800F1757B /* ItemCollectionViewCell.swift in Sources */,

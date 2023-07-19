@@ -18,7 +18,15 @@ class APIClient {
     
     func getData<T: Codable>(url: String , method: HTTPMethod, parameters: Parameters? = nil, headers: HTTPHeaders? = nil, responseClass: T.Type, complition: @escaping (Swift.Result<T, Error>) -> Void) {
         guard let url = URL(string: url) else { return }
-        AF.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers).response { response in
+        var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        if let parameters = parameters {
+            let queryItems = parameters.map {
+                return URLQueryItem(name: "\($0)", value: "\($1)")
+            }
+            urlComponents?.queryItems = queryItems
+        }
+        guard let finalURL = urlComponents?.url else { return }
+        AF.request(finalURL, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers).response { response in
             guard let statusCode = response.response?.statusCode else { return }
             guard (200...300).contains(statusCode) else {
                 complition(.failure(APIError.failedToLoadData))
