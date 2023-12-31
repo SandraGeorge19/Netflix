@@ -9,6 +9,8 @@ import UIKit
 
 class HomeViewController: UIViewController {
     
+    private var headerView:  HeroHeaderView?
+    private var randomMovie: ResultModel?
     let sectionTitles: [String] = ["Trending Movies", "Trending TV", "Popular","Upcoming Movies", "Top Rated"]
 
     let homeFeedTableView: UITableView = {
@@ -26,11 +28,25 @@ class HomeViewController: UIViewController {
         homeFeedTableView.dataSource = self
         
         configureNavBar()
-        let headerView = HeroHeaderView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
+        headerView = HeroHeaderView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTableView.tableHeaderView = headerView
-        
+        configureHeaderMovie()
     }
     
+    private func configureHeaderMovie() {
+        let parameters = ["api_key" : AppKeys.APIKey]
+        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingTv, method: .get, parameters: parameters,responseClass: TrendingMoviesModel.self) { [weak self] response in
+            guard let self = self else { return }
+            switch response {
+            case .success(let data):
+                self.randomMovie = data.results.randomElement()
+                guard let randomMovie = self.randomMovie else { return }
+                self.headerView?.configureHeader(with: randomMovie)
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         homeFeedTableView.frame = view.bounds
@@ -71,6 +87,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: HomeCollectionViewTableViewCell.identifier, for: indexPath) as? HomeCollectionViewTableViewCell else { return UITableViewCell()}
+        cell.delegate = self
         configureHomeTableViewCells(cell: cell, indexPath: indexPath)
         return cell
     }
@@ -144,4 +161,16 @@ private extension HomeViewController {
             print("Noting for configuring HomeTableViewCell")
         }
     }
+}
+extension HomeViewController: HomeCollectionViewTableViewCellDelegate {
+    func didTapCell(_ cell: HomeCollectionViewTableViewCell, model: MoviePreviewModel) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let vc = MoviePreviewViewController()
+            vc.configureView(with: model)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    
 }

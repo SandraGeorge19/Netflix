@@ -28,4 +28,5 @@ struct AppConstants {
     
     // MARK: - Youtube API Keys
     static let youtubeBaseURL = "https://youtube.googleapis.com/youtube/v3/search"
+    static let youtubeVID = "https://www.youtube.com/embed/"
 }

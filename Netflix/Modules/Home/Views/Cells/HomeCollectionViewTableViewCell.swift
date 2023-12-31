@@ -23,6 +23,8 @@ class HomeCollectionViewTableViewCell: UITableViewCell {
     }()
     
     private var movies: [ResultModel] = []
+    private var movieID: ID?
+    weak var delegate: HomeCollectionViewTableViewCellDelegate?
     // MARK: - Init(s)
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -51,6 +53,23 @@ class HomeCollectionViewTableViewCell: UITableViewCell {
             self.itemCollectionView.reloadData()
         }
     }
+    
+    private func getYoutubeResult(for movie: String) {
+        guard let queryValue = movie.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+        let parameters = [
+            "q": queryValue,
+            "key": AppKeys.youtubeKey
+        ]
+        APIClient.shared.getData(url: AppConstants.youtubeBaseURL, method: .get, parameters: parameters, responseClass: YoutubeSearchModel.self) { response in
+            switch response {
+            case .success(let data):
+                guard let movie = data.items?[0] else { return }
+                self.movieID = movie.id
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
 }
 
 extension HomeCollectionViewTableViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -64,6 +83,19 @@ extension HomeCollectionViewTableViewCell: UICollectionViewDelegate, UICollectio
         cell.configureCell(with: AppConstants.imgBaseURL + (movies[indexPath.row].posterPath ?? ""))
         return cell
     }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        guard let movieTitle = movies[indexPath.row].originalTitle ?? movies[indexPath.row].originalName else { return }
+        self.getYoutubeResult(for: movieTitle + " trailer")
+        guard let movieID = movieID else { return }
+        guard let movieDesc = movies[indexPath.row].overview else { return }
+        let movieObj = MoviePreviewModel(youtubeVideo: movieID, title: movieTitle, description: movieDesc)
+        delegate?.didTapCell(self, model: movieObj)
+    }
     
-    
+}
+
+
+protocol HomeCollectionViewTableViewCellDelegate: AnyObject {
+    func didTapCell(_ cell: HomeCollectionViewTableViewCell, model: MoviePreviewModel)
 }

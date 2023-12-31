@@ -26,6 +26,7 @@ class APIClient {
             urlComponents?.queryItems = queryItems
         }
         guard let finalURL = urlComponents?.url else { return }
+        print(finalURL)
         AF.request(finalURL, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers).response { response in
             guard let statusCode = response.response?.statusCode else { return }
             guard (200...300).contains(statusCode) else {

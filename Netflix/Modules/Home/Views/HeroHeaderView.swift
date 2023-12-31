@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class HeroHeaderView: UIView {
     
@@ -80,5 +81,10 @@ class HeroHeaderView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configureHeader(with model: ResultModel) {
+        guard let url = URL(string: AppConstants.imgBaseURL + (model.posterPath ?? "")) else { return }
+        headerImageView.kf.setImage(with: url)
     }
 }
