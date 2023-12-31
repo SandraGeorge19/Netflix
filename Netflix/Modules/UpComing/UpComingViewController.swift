@@ -72,4 +72,35 @@ extension UpComingViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return view.bounds.height / 7.0
     }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let movie = movies[indexPath.row]
+        guard let movieTitle = movie.originalTitle ?? movie.originalName else { return }
+        self.getMovie(for: movieTitle + " trailer", movieModel: movie)
+    }
+}
+
+extension UpComingViewController {
+    func getMovie(for movie: String, movieModel: ResultModel) {
+        guard let queryValue = movie.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+        let parameters = [
+            "q": queryValue,
+            "key": AppKeys.youtubeKey
+        ]
+        APIClient.shared.getData(url: AppConstants.youtubeBaseURL, method: .get, parameters: parameters, responseClass: YoutubeSearchModel.self) {[weak self] response in
+            guard let self = self else { return }
+            switch response {
+            case .success(let youtubeModel):
+                guard let videoId = youtubeModel.items?[0].id else { return }
+                DispatchQueue.main.async {
+                    let vc = MoviePreviewViewController()
+                    let moviePreviewModel = MoviePreviewModel(youtubeVideo: videoId , title: movie, description: movieModel.overview ?? "")
+                    vc.configureView(with: moviePreviewModel)
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
+    }
 }

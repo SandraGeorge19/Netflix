@@ -7,8 +7,14 @@
 
 import UIKit
 
+protocol SearchResultViewControllerDelegate: AnyObject {
+    func didTapOnItemOfSearch(model: MoviePreviewModel)
+}
+
 class SearchResultViewController: UIViewController {
 
+    // MARK: - Delegates
+    weak var delegate: SearchResultViewControllerDelegate?
     // MARK: - Properties
     private let searchResultCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -75,11 +81,34 @@ extension SearchResultViewController: UICollectionViewDelegate, UICollectionView
         cell.configureCell(with: AppConstants.imgBaseURL + (movies[indexPath.row].posterPath ?? ""))
         return cell
     }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        let movie = movies[indexPath.row]
+        guard let movieTitle = movie.originalTitle ?? movie.originalName else { return }
+        self.getMovie(for: movieTitle, movieModel: movie)
+    }
 }
 
 extension SearchResultViewController: SearchBarTapDelegate {
     func searchBarDidTap() {
         guard let query = query else { return }
         getSearchResults(for: query)
+    }
+    func getMovie(for movieTitle: String, movieModel: ResultModel) {
+        guard let queryValue = movieTitle.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+        let parameters = [
+            "q": queryValue,
+            "key": AppKeys.youtubeKey
+        ]
+        APIClient.shared.getData(url: AppConstants.youtubeBaseURL, method: .get, parameters: parameters, responseClass: YoutubeSearchModel.self) {[weak self] response in
+            guard let self = self else { return }
+            switch response {
+            case .success(let youtubeModel):
+                guard let videoId = youtubeModel.items?[0].id else { return }
+                self.delegate?.didTapOnItemOfSearch(model: MoviePreviewModel(youtubeVideo: videoId, title: movieTitle, description: movieModel.overview ?? ""))
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
 }

@@ -63,8 +63,10 @@ class HomeCollectionViewTableViewCell: UITableViewCell {
         APIClient.shared.getData(url: AppConstants.youtubeBaseURL, method: .get, parameters: parameters, responseClass: YoutubeSearchModel.self) { response in
             switch response {
             case .success(let data):
-                guard let movie = data.items?[0] else { return }
-                self.movieID = movie.id
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self, let movie = data.items?[0] else { return }
+                    self.movieID = movie.id
+                }
             case .failure(let error):
                 print(error.localizedDescription)
             }
