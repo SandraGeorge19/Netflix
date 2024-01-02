@@ -72,6 +72,16 @@ class HomeCollectionViewTableViewCell: UITableViewCell {
             }
         }
     }
+    private func downloadMovieAt(indexPath: IndexPath) {
+        DatabaseManager.shared.downloadMovieWith(model: movies[indexPath.row]) { result in
+            switch result {
+            case .success():
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "downloads"), object: nil)
+            case .failure(let error):
+                print("\(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 extension HomeCollectionViewTableViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -94,7 +104,18 @@ extension HomeCollectionViewTableViewCell: UICollectionViewDelegate, UICollectio
         let movieObj = MoviePreviewModel(youtubeVideo: movieID, title: movieTitle, description: movieDesc)
         delegate?.didTapCell(self, model: movieObj)
     }
-    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        let config = UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: nil) { [weak self] _ in
+                guard let self = self else { return UIMenu() }
+                let downloadAction = UIAction(title: "Download", state: .off) { _ in
+                    self.downloadMovieAt(indexPath: indexPaths[0])
+                }
+                return UIMenu(children: [downloadAction])
+            }
+        return config
+    }
 }
 
 
