@@ -8,16 +8,17 @@
 import UIKit
 
 class HomeViewController: UIViewController {
-    
+    // MARK: - Properties
+    private var viewModel: HomeViewModelProtocol = HomeViewModel()
     private var headerView:  HeroHeaderView?
-    private var randomMovie: ResultModel?
-    let sectionTitles: [String] = ["Trending Movies", "Trending TV", "Popular","Upcoming Movies", "Top Rated"]
 
+    // MARK: - UIElement(s)
     let homeFeedTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.register(HomeCollectionViewTableViewCell.self, forCellReuseIdentifier: HomeCollectionViewTableViewCell.identifier)
         return tableView
     }()
+    // MARK: - Lifecycle Method(s)
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -32,26 +33,18 @@ class HomeViewController: UIViewController {
         homeFeedTableView.tableHeaderView = headerView
         configureHeaderMovie()
     }
-    
-    private func configureHeaderMovie() {
-        let parameters = ["api_key" : AppKeys.APIKey]
-        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingTv, method: .get, parameters: parameters,responseClass: TrendingMoviesModel.self) { [weak self] response in
-            guard let self = self else { return }
-            switch response {
-            case .success(let data):
-                self.randomMovie = data.results.randomElement()
-                guard let randomMovie = self.randomMovie else { return }
-                self.headerView?.configureHeader(with: randomMovie)
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
-    }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         homeFeedTableView.frame = view.bounds
     }
-    
+    // MARK: - Function(s)
+    private func configureHeaderMovie() {
+        viewModel.trendingTvSubject.sink { [weak self] trendingTV in
+            guard let self = self else { return }
+            guard let randomMovie = trendingTV?.randomElement() else { return }
+            self.headerView?.configureHeader(with: randomMovie)
+        }.store(in: &viewModel.cancellables)
+    }
     private func configureNavBar() {
         var netflixLogo = UIImage(named: "pngwing.com")?.resizeImageTo(size: CGSize(width: 44, height: 44))
         netflixLogo = netflixLogo?.withRenderingMode(.alwaysOriginal)
@@ -66,13 +59,14 @@ class HomeViewController: UIViewController {
 
 }
 
+// MARK: - Extension(s)
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return sectionTitles.count
+        return viewModel.sectionTitles.count
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionTitles[section]
+        return viewModel.sectionTitles[section]
     }
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         guard let header = view as? UITableViewHeaderFooterView else { return }
@@ -110,53 +104,32 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - Extension for configuring table view cell
 private extension HomeViewController {
     func configureHomeTableViewCells(cell: HomeCollectionViewTableViewCell, indexPath: IndexPath) {
-        let parameters = ["api_key" : AppKeys.APIKey]
         switch indexPath.section {
         case Sections.trendingMovies.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingMovie, method: .get, parameters: parameters,responseClass: TrendingMoviesModel.self) { response in
-                switch response {
-                case .success(let data):
-                    cell.configureCell(with: data.results)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
+            viewModel.trendingMoviesSubject.sink { trendingMovies in
+                guard let results = trendingMovies else { return }
+                cell.configureCell(with: results)
+            }.store(in: &viewModel.cancellables)
         case Sections.trendingTV.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.trending + AppConstants.trendingTv, method: .get, parameters: parameters,responseClass: TrendingMoviesModel.self) { response in
-                switch response {
-                case .success(let data):
-                    cell.configureCell(with: data.results)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
+            viewModel.trendingTvSubject.sink { trendingTV in
+                guard let results = trendingTV else { return }
+                cell.configureCell(with: results)
+            }.store(in: &viewModel.cancellables)
         case Sections.popular.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.popularMovies, method: .get, parameters: parameters, responseClass: TrendingMoviesModel.self) { response in
-                switch response {
-                case .success(let data):
-                    cell.configureCell(with: data.results)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
+            viewModel.popularMoviesSubject.sink { popularMovies in
+                guard let results = popularMovies else { return }
+                cell.configureCell(with: results)
+            }.store(in: &viewModel.cancellables)
         case Sections.upcomingMovies.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.upcomingMovies, method: .get, parameters: parameters, responseClass: UpcomingMoviesModel.self) { response in
-                switch response {
-                case .success(let data):
-                    cell.configureCell(with: data.results)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
+            viewModel.upComingMoviesSubject.sink { upComingMovies in
+                guard let results = upComingMovies else { return }
+                cell.configureCell(with: results)
+            }.store(in: &viewModel.cancellables)
         case Sections.topRated.rawValue:
-            APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.topRatedMovies, method: .get, parameters: parameters, responseClass: TrendingMoviesModel.self) { response in
-                switch response {
-                case .success(let data):
-                    cell.configureCell(with: data.results)
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            }
+            viewModel.topRatedMoviesSubject.sink { topRatedMovies in
+                guard let results = topRatedMovies else { return }
+                cell.configureCell(with: results)
+            }.store(in: &viewModel.cancellables)
         default:
             print("Noting for configuring HomeTableViewCell")
         }

@@ -13,6 +13,11 @@ class HomeCollectionViewTableViewCell: UITableViewCell {
     static let identifier = "HomeCollectionViewTableViewCell"
     
     // MARK: - Properties
+    private var viewModel: HomeViewModelProtocol = HomeViewModel()
+    private var movies: [ResultModel] = []
+    weak var delegate: HomeCollectionViewTableViewCellDelegate?
+    
+    // MARK: - UIElement(s)
     private let itemCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 140, height: 200)
@@ -21,10 +26,6 @@ class HomeCollectionViewTableViewCell: UITableViewCell {
         collectionView.register(ItemCollectionViewCell.self, forCellWithReuseIdentifier: ItemCollectionViewCell.identifier)
         return collectionView
     }()
-    
-    private var movies: [ResultModel] = []
-    private var movieID: ID?
-    weak var delegate: HomeCollectionViewTableViewCellDelegate?
     // MARK: - Init(s)
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -53,35 +54,6 @@ class HomeCollectionViewTableViewCell: UITableViewCell {
             self.itemCollectionView.reloadData()
         }
     }
-    
-    private func getYoutubeResult(for movie: String) {
-        guard let queryValue = movie.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
-        let parameters = [
-            "q": queryValue,
-            "key": AppKeys.youtubeKey
-        ]
-        APIClient.shared.getData(url: AppConstants.youtubeBaseURL, method: .get, parameters: parameters, responseClass: YoutubeSearchModel.self) { response in
-            switch response {
-            case .success(let data):
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self, let movie = data.items?[0] else { return }
-                    self.movieID = movie.id
-                }
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
-    }
-    private func downloadMovieAt(indexPath: IndexPath) {
-        DatabaseManager.shared.downloadMovieWith(model: movies[indexPath.row]) { result in
-            switch result {
-            case .success():
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "downloads"), object: nil)
-            case .failure(let error):
-                print("\(error.localizedDescription)")
-            }
-        }
-    }
 }
 
 extension HomeCollectionViewTableViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -98,11 +70,14 @@ extension HomeCollectionViewTableViewCell: UICollectionViewDelegate, UICollectio
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         guard let movieTitle = movies[indexPath.row].originalTitle ?? movies[indexPath.row].originalName else { return }
-        self.getYoutubeResult(for: movieTitle + " trailer")
-        guard let movieID = movieID else { return }
-        guard let movieDesc = movies[indexPath.row].overview else { return }
-        let movieObj = MoviePreviewModel(youtubeVideo: movieID, title: movieTitle, description: movieDesc)
-        delegate?.didTapCell(self, model: movieObj)
+        viewModel.getYoutubeResults(for: movieTitle + " trailer")
+        viewModel.youtubeResultsSubject.sink {[weak self] movies in
+            guard let self = self else { return }
+            guard let movieID = movies?[0].id else { return }
+            guard let movieDesc = self.movies[indexPath.row].overview else { return }
+            let movieObj = MoviePreviewModel(youtubeVideo: movieID, title: movieTitle, description: movieDesc)
+            delegate?.didTapCell(self, model: movieObj)
+        }.store(in: &viewModel.cancellables)
     }
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         let config = UIContextMenuConfiguration(
@@ -110,7 +85,8 @@ extension HomeCollectionViewTableViewCell: UICollectionViewDelegate, UICollectio
             previewProvider: nil) { [weak self] _ in
                 guard let self = self else { return UIMenu() }
                 let downloadAction = UIAction(title: "Download", state: .off) { _ in
-                    self.downloadMovieAt(indexPath: indexPaths[0])
+                    self.viewModel.downloadMovieWith(model: self.movies[indexPaths[0].row])
+//                    self.downloadMovieAt(indexPath: indexPaths[0])
                 }
                 return UIMenu(children: [downloadAction])
             }

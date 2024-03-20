@@ -7,40 +7,57 @@
 
 import Foundation
 import Alamofire
+import Combine
 
 
-class APIClient {
+class APIClient: APIClientProtocol {
     static let shared = APIClient()
     
     private init() {
         // private init
     }
     
-    func getData<T: Codable>(url: String , method: HTTPMethod, parameters: Parameters? = nil, headers: HTTPHeaders? = nil, responseClass: T.Type, complition: @escaping (Swift.Result<T, Error>) -> Void) {
-        guard let url = URL(string: url) else { return }
+    func getDataa<T: Codable, M: EndPointType>(fromEndPoint: M, responseClass: T.Type) -> AnyPublisher<DataResponse<T, NetworkError>, Never> {
+        let url = fromEndPoint.path == nil ? URL(string: fromEndPoint.baseURL)! : URL(string: fromEndPoint.baseURL + (fromEndPoint.path ?? ""))!
+        let method = Alamofire.HTTPMethod(rawValue: fromEndPoint.method.rawValue)
+        let headers = fromEndPoint.headers
+        let params = buildParams(task: fromEndPoint.task)
         var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        if let parameters = parameters {
+        if let parameters = params.0 {
             let queryItems = parameters.map {
                 return URLQueryItem(name: "\($0)", value: "\($1)")
             }
             urlComponents?.queryItems = queryItems
         }
-        guard let finalURL = urlComponents?.url else { return }
-        print(finalURL)
-        AF.request(finalURL, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers).response { response in
-            guard let statusCode = response.response?.statusCode else { return }
-            guard (200...300).contains(statusCode) else {
-                complition(.failure(APIError.failedToLoadData))
-                return
-            }
-            switch response.result {
-            case .success(let data):
-                guard let data = data else { return }
-                guard let jsonData = try? JSONDecoder().decode(T.self, from: data) else { return }
-                complition(.success(jsonData))
-            case .failure(let error):
-                complition(.failure(error))
-            }
+        let finalURL = urlComponents?.url
+        print(finalURL!)
+        return AF.request(url,
+                   method: method,
+                   parameters: params.0,
+                   encoding: params.1,
+                   headers: headers
+        ).validate()
+            .publishDecodable(type: T.self)
+            .map { response in
+                response.mapError { error -> NetworkError in
+                    if let receivedError = error as Error? as? NetworkError {
+                        return receivedError
+                    } else if error as Error? is DecodingError {
+                        return NetworkError.unableToDecode
+                    } else {
+                        return NetworkError.unacceptableStatusCode
+                    }
+                }
+            }.receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
+    private func buildParams(task: Task) -> ([String : Any]?, ParameterEncoding){
+        switch task {
+        case .requestPlain:
+            return ([:], URLEncoding.default)
+        case .requestParam(parameters: let parameters , encoding: let encoding):
+            return (parameters, encoding)
         }
     }
 }

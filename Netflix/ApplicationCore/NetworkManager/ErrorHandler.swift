@@ -6,7 +6,12 @@
 //
 
 import Foundation
+import Alamofire
 
-enum APIError: Error {
-case failedToLoadData
+enum NetworkError: Error {
+    case invalidUrl
+    case noInternet
+    case unableToDecode
+    case unacceptableStatusCode
+    case failedToLoadData
 }

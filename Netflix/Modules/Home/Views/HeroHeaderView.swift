@@ -9,7 +9,7 @@ import UIKit
 import Kingfisher
 
 class HeroHeaderView: UIView {
-    
+    // MARK: - UIElement(s)
     private let playButton: UIButton = {
         var configuration = UIButton.Configuration.plain()
         configuration.titlePadding = 10
@@ -49,7 +49,7 @@ class HeroHeaderView: UIView {
         imageView.image = UIImage(named: "spiderMan")
         return imageView
     }()
-    
+    // MARK: - UIMethod(s)
     private func addGradient() {
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = self.bounds
@@ -59,18 +59,17 @@ class HeroHeaderView: UIView {
         ]
         layer.addSublayer(gradientLayer)
     }
+    // MARK: - Initializer(s)
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(headerImageView)
         addGradient()
         addStackView()
     }
-    private func addStackView() {
-        addSubview(buttonsStackView)
-        buttonsStackView.addArrangedSubview(playButton)
-        buttonsStackView.addArrangedSubview(downloadButton)
-        buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
+    // MARK: - Lifecycle Method(s)
     override func layoutSubviews() {
         super.layoutSubviews()
         headerImageView.frame = self.bounds
@@ -78,9 +77,11 @@ class HeroHeaderView: UIView {
         buttonsStackView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -32).isActive = true
         buttonsStackView.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: 150).isActive = true
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func addStackView() {
+        addSubview(buttonsStackView)
+        buttonsStackView.addArrangedSubview(playButton)
+        buttonsStackView.addArrangedSubview(downloadButton)
+        buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func configureHeader(with model: ResultModel) {

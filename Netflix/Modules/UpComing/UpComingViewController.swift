@@ -10,12 +10,12 @@ import UIKit
 class UpComingViewController: UIViewController {
 
     // MARK: - Properties
+    private var viewModel: UpComingViewModelProtocol?
     private let upcomingTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.identifier)
         return tableView
     }()
-    private var movies: [ResultModel] = []
     
     // MARK: - Lifecycle Method(s)
     override func viewDidLoad() {
@@ -26,7 +26,11 @@ class UpComingViewController: UIViewController {
         navigationController?.navigationItem.largeTitleDisplayMode = .always
         view.addSubview(upcomingTableView)
         setupTableViewDelegates()
-        getUpcomingMovies()
+        viewModel = UpComingViewModel()
+        viewModel?.getUpComingMovies()
+//        DispatchQueue.main.async {
+//            self.upcomingTableView.reloadData()
+//        }
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -38,35 +42,19 @@ class UpComingViewController: UIViewController {
         upcomingTableView.delegate = self
         upcomingTableView.dataSource = self
     }
-   
-    func getUpcomingMovies() {
-        let parameters = ["api_key" : AppKeys.APIKey]
-        APIClient.shared.getData(url: AppConstants.baseURL + AppConstants.movie + AppConstants.upcomingMovies, method: .get, parameters: parameters, responseClass: UpcomingMoviesModel.self) { [weak self] response in
-            guard let self = self else { return }
-            switch response {
-            case .success(let data):
-                self.movies = data.results
-                print("upcoming \(self.movies)")
-                DispatchQueue.main.async {
-                    self.upcomingTableView.reloadData()
-                }
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
-    }
 }
 
 // MARK: - Extension(s)
 
 extension UpComingViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return movies.count
+        return viewModel?.upComingMoviesSubject.value?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableViewCell.identifier, for: indexPath) as? MovieTableViewCell else { return UITableViewCell()}
-        cell.configureCell(with: movies[indexPath.row])
+        guard let movie = viewModel?.upComingMoviesSubject.value?[indexPath.row] else { return UITableViewCell()}
+        cell.configureCell(with: movie)
         return cell
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -74,33 +62,33 @@ extension UpComingViewController: UITableViewDelegate, UITableViewDataSource {
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let movie = movies[indexPath.row]
+        guard let movie = viewModel?.upComingMoviesSubject.value?[indexPath.row] else { return }
         guard let movieTitle = movie.originalTitle ?? movie.originalName else { return }
-        self.getMovie(for: movieTitle + " trailer", movieModel: movie)
+//        self.getMovie(for: movieTitle + " trailer", movieModel: movie)
     }
 }
-
-extension UpComingViewController {
-    func getMovie(for movie: String, movieModel: ResultModel) {
-        guard let queryValue = movie.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
-        let parameters = [
-            "q": queryValue,
-            "key": AppKeys.youtubeKey
-        ]
-        APIClient.shared.getData(url: AppConstants.youtubeBaseURL, method: .get, parameters: parameters, responseClass: YoutubeSearchModel.self) {[weak self] response in
-            guard let self = self else { return }
-            switch response {
-            case .success(let youtubeModel):
-                guard let videoId = youtubeModel.items?[0].id else { return }
-                DispatchQueue.main.async {
-                    let vc = MoviePreviewViewController()
-                    let moviePreviewModel = MoviePreviewModel(youtubeVideo: videoId , title: movie, description: movieModel.overview ?? "")
-                    vc.configureView(with: moviePreviewModel)
-                    self.navigationController?.pushViewController(vc, animated: true)
-                }
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
-        }
-    }
-}
+//
+//extension UpComingViewController {
+//    func getMovie(for movie: String, movieModel: ResultModel) {
+//        guard let queryValue = movie.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else { return }
+//        let parameters = [
+//            "q": queryValue,
+//            "key": AppKeys.youtubeKey
+//        ]
+//        APIClient.shared.getData(url: AppConstants.youtubeBaseURL, method: .get, parameters: parameters, responseClass: YoutubeSearchModel.self) {[weak self] response in
+//            guard let self = self else { return }
+//            switch response {
+//            case .success(let youtubeModel):
+//                guard let videoId = youtubeModel.items?[0].id else { return }
+//                DispatchQueue.main.async {
+//                    let vc = MoviePreviewViewController()
+//                    let moviePreviewModel = MoviePreviewModel(youtubeVideo: videoId , title: movie, description: movieModel.overview ?? "")
+//                    vc.configureView(with: moviePreviewModel)
+//                    self.navigationController?.pushViewController(vc, animated: true)
+//                }
+//            case .failure(let error):
+//                print(error.localizedDescription)
+//            }
+//        }
+//    }
+//}
